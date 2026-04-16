@@ -1,0 +1,175 @@
+{
+  "info": {
+    "name": "Presto TOU API",
+    "description": "Time-of-Use pricing API for EV chargers. Import this collection and set baseUrl + chargerId / stationId / scheduleId variables in the Postman environment to explore every endpoint.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000/api/v1" },
+    { "key": "stationId", "value": "" },
+    { "key": "chargerId", "value": "" },
+    { "key": "scheduleId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Meta",
+      "item": [
+        {
+          "name": "Health",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+        },
+        {
+          "name": "List timezones",
+          "request": { "method": "GET", "url": "{{baseUrl}}/timezones" }
+        }
+      ]
+    },
+    {
+      "name": "Stations",
+      "item": [
+        { "name": "List stations", "request": { "method": "GET", "url": "{{baseUrl}}/stations" } },
+        {
+          "name": "Create station",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/stations",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Station\",\n  \"address\": \"Some address\",\n  \"timezone\": \"Asia/Kolkata\"\n}"
+            }
+          }
+        },
+        { "name": "Get station", "request": { "method": "GET", "url": "{{baseUrl}}/stations/{{stationId}}" } },
+        {
+          "name": "Update station",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/stations/{{stationId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"address\": \"Updated address\"\n}" }
+          }
+        },
+        { "name": "Delete station", "request": { "method": "DELETE", "url": "{{baseUrl}}/stations/{{stationId}}" } }
+      ]
+    },
+    {
+      "name": "Chargers",
+      "item": [
+        { "name": "List chargers", "request": { "method": "GET", "url": "{{baseUrl}}/chargers" } },
+        { "name": "List chargers by station", "request": { "method": "GET", "url": "{{baseUrl}}/chargers?stationId={{stationId}}" } },
+        {
+          "name": "Create charger",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/chargers",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stationId\": \"{{stationId}}\",\n  \"serialNumber\": \"NEW-01\",\n  \"label\": \"Bay 1\",\n  \"connectorType\": \"CCS2\",\n  \"powerKw\": 150\n}"
+            }
+          }
+        },
+        { "name": "Get charger", "request": { "method": "GET", "url": "{{baseUrl}}/chargers/{{chargerId}}" } },
+        {
+          "name": "Update charger",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/chargers/{{chargerId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"label\": \"Updated label\"\n}" }
+          }
+        },
+        { "name": "Delete charger", "request": { "method": "DELETE", "url": "{{baseUrl}}/chargers/{{chargerId}}" } }
+      ]
+    },
+    {
+      "name": "Pricing (customer)",
+      "item": [
+        { "name": "Current price (now)", "request": { "method": "GET", "url": "{{baseUrl}}/chargers/{{chargerId}}/pricing/current" } },
+        { "name": "Current price (at instant)", "request": { "method": "GET", "url": "{{baseUrl}}/chargers/{{chargerId}}/pricing/current?at=2026-04-17T14:30:00%2B05:30" } },
+        { "name": "Daily schedule (today)", "request": { "method": "GET", "url": "{{baseUrl}}/chargers/{{chargerId}}/pricing/schedule" } },
+        { "name": "Daily schedule (specific date)", "request": { "method": "GET", "url": "{{baseUrl}}/chargers/{{chargerId}}/pricing/schedule?date=2026-04-17" } }
+      ]
+    },
+    {
+      "name": "Schedules (admin)",
+      "item": [
+        { "name": "List schedules for charger", "request": { "method": "GET", "url": "{{baseUrl}}/chargers/{{chargerId}}/schedules" } },
+        {
+          "name": "Create schedule (PDF example)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/chargers/{{chargerId}}/schedules",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Default TOU\",\n  \"currency\": \"USD\",\n  \"effectiveFrom\": \"2026-04-01\",\n  \"isActive\": true,\n  \"periods\": [\n    { \"startTime\": \"00:00\", \"endTime\": \"06:00\", \"pricePerKwh\": 0.15 },\n    { \"startTime\": \"06:00\", \"endTime\": \"12:00\", \"pricePerKwh\": 0.20 },\n    { \"startTime\": \"12:00\", \"endTime\": \"14:00\", \"pricePerKwh\": 0.25 },\n    { \"startTime\": \"14:00\", \"endTime\": \"18:00\", \"pricePerKwh\": 0.30 },\n    { \"startTime\": \"18:00\", \"endTime\": \"20:00\", \"pricePerKwh\": 0.25 },\n    { \"startTime\": \"20:00\", \"endTime\": \"22:00\", \"pricePerKwh\": 0.20 },\n    { \"startTime\": \"22:00\", \"endTime\": \"00:00\", \"pricePerKwh\": 0.15 }\n  ]\n}"
+            }
+          }
+        },
+        { "name": "Get schedule", "request": { "method": "GET", "url": "{{baseUrl}}/schedules/{{scheduleId}}" } },
+        {
+          "name": "Update schedule metadata",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/schedules/{{scheduleId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Renamed\",\n  \"isActive\": true\n}" }
+          }
+        },
+        {
+          "name": "Replace schedule periods",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/schedules/{{scheduleId}}/periods",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"periods\": [\n    { \"startTime\": \"00:00\", \"endTime\": \"12:00\", \"pricePerKwh\": 0.40 },\n    { \"startTime\": \"12:00\", \"endTime\": \"00:00\", \"pricePerKwh\": 0.20 }\n  ]\n}"
+            }
+          }
+        },
+        { "name": "Delete schedule", "request": { "method": "DELETE", "url": "{{baseUrl}}/schedules/{{scheduleId}}" } },
+        {
+          "name": "Clone schedule",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/schedules/{{scheduleId}}/clone",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"targetChargerId\": \"{{chargerId}}\",\n  \"isActive\": false\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bulk",
+      "item": [
+        {
+          "name": "Bulk apply by chargerIds",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/pricing/bulk",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chargerIds\": [\"{{chargerId}}\"],\n  \"schedule\": {\n    \"name\": \"Bulk Schedule\",\n    \"currency\": \"USD\",\n    \"effectiveFrom\": \"2026-04-01\",\n    \"periods\": [\n      { \"startTime\": \"00:00\", \"endTime\": \"08:00\", \"pricePerKwh\": 0.10 },\n      { \"startTime\": \"08:00\", \"endTime\": \"20:00\", \"pricePerKwh\": 0.35 },\n      { \"startTime\": \"20:00\", \"endTime\": \"00:00\", \"pricePerKwh\": 0.15 }\n    ]\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Bulk apply by stationIds",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/pricing/bulk/by-station",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stationIds\": [\"{{stationId}}\"],\n  \"schedule\": {\n    \"currency\": \"USD\",\n    \"effectiveFrom\": \"2026-04-01\",\n    \"periods\": [\n      { \"startTime\": \"00:00\", \"endTime\": \"12:00\", \"pricePerKwh\": 0.20 },\n      { \"startTime\": \"12:00\", \"endTime\": \"00:00\", \"pricePerKwh\": 0.30 }\n    ]\n  }\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

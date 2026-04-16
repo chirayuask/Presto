@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: presto-tou-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: presto
+      POSTGRES_PASSWORD: presto
+      POSTGRES_DB: presto_tou
+    ports:
+      - "5432:5432"
+    volumes:
+      - presto_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U presto -d presto_tou"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: presto-tou-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: presto_tou
+      DB_USER: presto
+      DB_PASSWORD: presto
+      DB_DIALECT: postgres
+      LOG_LEVEL: info
+    ports:
+      - "4000:4000"
+
+volumes:
+  presto_pg_data:
