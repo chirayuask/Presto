@@ -165,6 +165,8 @@ Covers unit tests (time math, period validation), pricing endpoint integration, 
 - [`docs/schema.md`](docs/schema.md) — database schema, ER diagram, field-by-field reference
 - [`docs/api.md`](docs/api.md) — every endpoint with request/response contracts and curl examples
 - [`docs/design-decisions.md`](docs/design-decisions.md) — architectural rationale
+- [`docs/timezone-validation.md`](docs/timezone-validation.md) — how to verify multi-timezone handling (with proof)
+- [`docs/operations-sop.md`](docs/operations-sop.md) — standard procedures for the ops team
 - [`postman/presto-tou.postman_collection.json`](postman/presto-tou.postman_collection.json) — importable Postman collection
 
 ---
